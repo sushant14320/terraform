@@ -1,44 +1,16 @@
-variable "ami_id" {
+variable "vnetname" {
 type = string
 
 }
 
-
-variable "instance_type" {
-type = string  
-
-}
-
-
-variable "dynamotablename" {
-    type = string
-  
-}
-
-variable "hash_key" {
- type = string 
-}
-
-
-variable "billing_mode" {
+variable "vmname" {
     type = string
   
 }
 
 
-variable "stream_enabled" {
-type = string 
-}
-
-
-
-variable "stream_view_type" {
+variable "storage_account_name" {
     type = string
   
 }
 
-
-variable "attributename" {
-    type = string
-  
-}

@@ -1,81 +1,84 @@
 terraform {
   required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 4.16"
+    azurerm = {
+      source = "hashicorp/azurerm"
+      version = ">= 3.80, <= 4.28.0"
     }
+      azapi = {
+    source = "azure/azapi"
+    version = "~>1.5"
   }
 
-  required_version = ">= 1.2.0"
+  }
+
+
+
 }
 
-provider "aws" {
-  region  = "us-west-2"
+provider "azurerm" {
   
 }
 
-resource "aws_instance" "example_server" {
-  ami           = var.ami_id
-  instance_type = var.instance_type
+resource "azurerm_resource_group" "testrg" {
+  name     = "TestRg"
+  location = "East US"
+}
 
-  tags = {
-    Name = "createdbyterraform"
+resource "azurerm_virtual_network" "testvnet" {
+  name                = var.vnetname
+  address_space       = ["10.0.0.0/16"]
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+}
+
+resource "azurerm_subnet" "testsubnet" {
+  name                 = "testsubnet"
+  resource_group_name  = azurerm_resource_group.main.name
+  virtual_network_name = azurerm_virtual_network.main_vnet.name
+  address_prefixes     = ["10.0.1.0/24"]
+}
+
+resource "azurerm_network_interface" "testnic" {
+  name                = "nic"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+
+  ip_configuration {
+    name                          = "internal"
+    subnet_id                     = azurerm_subnet.main_subnet.id
+    private_ip_address_allocation = "Dynamic"
   }
 }
 
+resource "azurerm_linux_virtual_machine" "testvm" {
+  name                = var.vmname
+  resource_group_name = azurerm_resource_group.main.name
+  location            = azurerm_resource_group.main.location
+  size                = "Standard_B1s"
+  admin_username      = "admin"
+  network_interface_ids = [
+    azurerm_network_interface.main_nic.id,
+  ]
 
-resource "aws_dynamodb_table" "dynamotable" {
-  name             = var.dynamotablename
-  hash_key         = var.hash_key
-  billing_mode     = var.billing_mode
-  stream_enabled   = true
-  stream_view_type = var.stream_view_type
 
-  attribute {
-    name = var.attributename
-    type = "S"
+
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
   }
 
-  replica {
-    region_name = "us-east-2"
-  }
-
-}
-
-resource "aws_vpc" "main_vpc" {
-  cidr_block = "10.0.0.0/16"
-
-  tags = {
-    Name = "main-vpc"
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "UbuntuServer"
+    sku       = "20_04-lts"
+    version   = "latest"
   }
 }
 
-resource "aws_subnet" "main_subnet" {
-  vpc_id            = aws_vpc.main_vpc.id
-  cidr_block        = "10.0.1.0/24"
-  availability_zone = "us-east-1a"
-
-  tags = {
-    Name = "main-subnet"
-  }
-}
-
-resource "aws_security_group" "ec2_sg" {
-  name        = "allow_ssh"
-  description = "Allow SSH traffic"
-  vpc_id      = aws_vpc.main_vpc.id
-
-  ingress {
-    description = "SSH"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-
-
-  tags = {
-    Name = "ec2-sg"
-  }
+resource "azurerm_storage_account" "main_storage" {
+  name                     = var.storage_account_name
+  resource_group_name      = azurerm_resource_group.main.name
+  location                 = azurerm_resource_group.main.location
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
 }

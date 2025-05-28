@@ -2,7 +2,7 @@ name: Deploy to AWS using Terraform
 
 on:
   push:
-    branches: [ mainn ]
+    branches: [ main ]
 
 jobs:
   terraform:

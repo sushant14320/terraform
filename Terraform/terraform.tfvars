@@ -1,3 +1,3 @@
 vnetname = "testvnet"
 vmname = "testvm"
-storage_account_name = "teststorageacc"
+storage_account_name = "storageacc-radical"

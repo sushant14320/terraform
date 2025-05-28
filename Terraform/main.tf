@@ -56,7 +56,7 @@ resource "azurerm_linux_virtual_machine" "testvm" {
   resource_group_name = azurerm_resource_group.testrg.name
   location            = azurerm_resource_group.testrg.location
   size                = "Standard_B1s"
-  admin_username      = "admin"
+  admin_username      = "newusr"
   network_interface_ids = [
     azurerm_network_interface.testnic.id,
   ]

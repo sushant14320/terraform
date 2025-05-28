@@ -23,6 +23,7 @@ provider "azurerm" {
   client_secret =   "BN18Q~KLAoRj.u16t5g8jlDraAbgg~4IlJDbzbVi"
 }
 
+
 resource "azurerm_resource_group" "testrg" {
   name     = "TestRg"
   location = "East US"

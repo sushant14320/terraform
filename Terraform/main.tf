@@ -1,8 +1,8 @@
 terraform {
   backend "azurerm" {
-    resource_group_name  = "staterg"
-    storage_account_name = "statergradical"   # Must be globally unique
-    container_name       = "tfstate"
+    resource_group_name  = "vmrg"
+    storage_account_name = "vmrgradical"   # Must be globally unique
+    container_name       = "statecont"
     key                  = "terraform.tfstate"
   }
   required_providers {
